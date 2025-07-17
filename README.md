@@ -1,4 +1,9 @@
-# ecometricx_ds
+# Ecometricx Take Home - Data Scientist
+
+# Read PDF Report and Notebook
+[View Notebook](rag_ecometrics.ipynb) \
+[View HTML Report](rag_ecometrics.html) \
+[View PDF Report](rag_ecometrics.pdf)
 
 ## You will be given a PDF document that contains both textual and graphical data. Your task is to:
 
@@ -11,12 +16,6 @@
 * Document your approach and display your results in a Jupyter notebook (.ipynb)
 * Your solution should allow users to query both the extracted text and any data that was derived from the graphical elements (such as tables).
 * Provide brief explanations of your approach, choices made, and any challenges you encountered.
-
-
-# Read PDF Report and Notebook
-[View Notebook](rag_ecometrics.ipynb) \
-[View HTML Report](rag_ecometrics.html) \
-[View PDF Report](rag_ecometrics.pdf)
 
 # Solution Overview
 
