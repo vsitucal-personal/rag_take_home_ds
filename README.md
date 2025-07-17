@@ -1,4 +1,4 @@
-# Ecometricx Take Home - Data Scientist
+# EcoMetricx Take Home - Data Scientist
 
 ## Read PDF Report and Notebook
 [View Notebook](/rag_ecometricx.ipynb) \

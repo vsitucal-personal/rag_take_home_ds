@@ -33,9 +33,9 @@ def get_images_base64(chunks):
     return images_b64
 
 
-def display_base64_image(base64_code):
+def display_base64_image(base64_code, width):
     image_data = base64.b64decode(base64_code)
-    display(Image(data=image_data, width=1000))
+    display(Image(data=image_data, width=width))
 
 def parse_docs(docs):
     b64 = []
