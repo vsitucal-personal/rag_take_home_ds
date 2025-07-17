@@ -1,9 +1,9 @@
 # Ecometricx Take Home - Data Scientist
 
 ## Read PDF Report and Notebook
-[View Notebook](/rag_ecometricxs.ipynb) \
-[View HTML Report](/rag_ecometricxs.html) \
-[View PDF Report](/rag_ecometricxs.pdf)
+[View Notebook](/rag_ecometricx.ipynb) \
+[View HTML Report](/rag_ecometricx.html) \
+[View PDF Report](/rag_ecometricx.pdf)
 
 ## You will be given a PDF document that contains both textual and graphical data. Your task is to:
 
