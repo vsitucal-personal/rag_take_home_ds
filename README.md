@@ -37,13 +37,16 @@ The diagram starts with the input PDF file. The unstructured Python library is u
 - Install dependencies \
 `pip install -r requirements.txt`
 
-
+- Start jupyterlab access at [http://localhost:8888/lab](http://localhost:8888/lab) \
+`python -m jupyter lab`
 
 **Unstructured Python Library dependency to properly read PDF**
+
 - Download [Poppler](https://github.com/oschwartz10612/poppler-windows/releases) extract and put bin directory to your `PATH`
 - Download and install [Tesseract](https://github.com/UB-Mannheim/tesseract/wiki) put bin directory to your `PATH`
 
 **Ollama Setup (Will act as LLM generator)**
+
 - Install [Ollama](https://ollama.com/download)
 - Get a model \
 `ollama pull <model_name>` \
