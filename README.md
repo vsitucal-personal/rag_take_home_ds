@@ -59,5 +59,7 @@ e.g. `ollama pull gemma2`
 - `\diagrams\` - Contains supplementary images and drawio diagram
 - `helper.py` – Contains utility functions to keep the notebook clean and organized
 - `rag_ecometricx.ipynb` - Main jupyter notebook
+- `rag_ecometricx.html` - HTML export incase images are broken in notebook
+- `rag_ecometricx.pdf` - PDF export incase images are broken in notebook
 - `README.md` - README
 - `requirements.txt` - Python dependencies
