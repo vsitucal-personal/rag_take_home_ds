@@ -7658,7 +7658,9 @@ e.g. <code>ollama pull gemma2</code></li>
 <span class="kn">from</span><span class="w"> </span><span class="nn">langchain.retrievers.multi_vector</span><span class="w"> </span><span class="kn">import</span> <span class="n">MultiVectorRetriever</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">unstructured.partition.pdf</span><span class="w"> </span><span class="kn">import</span> <span class="n">partition_pdf</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">helper</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_images_base64</span><span class="p">,</span> <span class="n">display_base64_image</span><span class="p">,</span> <span class="n">parse_docs</span><span class="p">,</span> <span class="n">build_prompt</span>
+
+<span class="c1"># from helper.py custom utility functions</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">helper</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_images_base64</span><span class="p">,</span> <span class="n">display_base64_image</span><span class="p">,</span> <span class="n">parse_docs</span><span class="p">,</span> <span class="n">build_prompt</span><span class="p">,</span> <span class="n">get_text_summaries</span><span class="p">,</span> <span class="n">query_and_validate</span>
 </pre></div>
 </div>
 </div>
@@ -7674,8 +7676,9 @@ e.g. <code>ollama pull gemma2</code></li>
 <h2 id="Set-Important-Variables">Set Important Variables<a class="anchor-link" href="#Set-Important-Variables">¶</a></h2><ul>
 <li><strong><code>pdf_file_path</code></strong>: Path to the input PDF file.</li>
 <li><strong><code>caption_model_name</code></strong>: Model used for generating captions from images.</li>
+<li><strong><code>text_summary_model_name</code></strong>: Model used for text summarization</li>
 <li><strong><code>text_embedding_model_name</code></strong>: Model for embedding text into vectors for retrieval.</li>
-<li><strong><code>ollama_model_name</code></strong>: Ollama model used for both embedding and answering questions.</li>
+<li><strong><code>ollama_model_name</code></strong>: Ollama model used for question and answering questions.</li>
 </ul>
 </div>
 </div>
@@ -7689,9 +7692,10 @@ e.g. <code>ollama pull gemma2</code></li>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="n">pdf_file_path</span> <span class="o">=</span> <span class="s2">"data/test_info_extract.pdf"</span>
-<span class="n">caption_model_name</span> <span class="o">=</span> <span class="s2">"microsoft/git-base"</span>
-<span class="n">text_embedding_model_name</span> <span class="o">=</span> <span class="s2">"BAAI/bge-large-en-v1.5"</span>
-<span class="n">ollama_model_name</span> <span class="o">=</span> <span class="s2">"gemma3"</span>
+<span class="n">caption_model_name</span> <span class="o">=</span> <span class="s2">"microsoft/git-base"</span>                         <span class="c1"># HuggingFace</span>
+<span class="n">text_summary_model_name</span> <span class="o">=</span> <span class="s2">"gemma2:2b"</span>                             <span class="c1"># Ollama</span>
+<span class="n">text_embedding_model_name</span> <span class="o">=</span> <span class="s2">"BAAI/bge-large-en-v1.5"</span>              <span class="c1"># HuggingFace</span>
+<span class="n">ollama_model_name</span> <span class="o">=</span> <span class="s2">"gemma3"</span>                                      <span class="c1"># Ollama</span>
 </pre></div>
 </div>
 </div>
@@ -7729,6 +7733,7 @@ e.g. <code>ollama pull gemma2</code></li>
     <span class="n">max_characters</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span>                  <span class="c1"># defaults to 500</span>
     <span class="n">combine_text_under_n_chars</span><span class="o">=</span><span class="mi">2000</span><span class="p">,</span>       <span class="c1"># defaults to 0</span>
     <span class="n">new_after_n_chars</span><span class="o">=</span><span class="mi">6000</span><span class="p">,</span>
+    <span class="n">mage_output_dir_path</span><span class="o">=</span><span class="s2">"/images/"</span>
 <span class="p">)</span>
 </pre></div>
 </div>
@@ -7980,7 +7985,7 @@ e.g. <code>ollama pull gemma2</code></li>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Getting images from our chunk we assign it to the <code>images</code> variable, upon checking the images list we seem to have 11 images extracted</p>
+<p>Getting images from our chunk we assign it to the <code>images</code> variable, with the help of helper functions <code>get_images_base64</code> to get the image chunks and <code>display_base64_image</code> to display them. Upon checking the images list we seem to have 11 images extracted</p>
 </div>
 </div>
 </div>
@@ -8104,11 +8109,11 @@ e.g. <code>ollama pull gemma2</code></li>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="Text-Summary">Text Summary<a class="anchor-link" href="#Text-Summary">¶</a></h3><p>For the text summary, I’ll use the original text itself as its own description since the content is brief and doesn't require further summarization.</p>
+<h3 id="Text-Summary">Text Summary<a class="anchor-link" href="#Text-Summary">¶</a></h3><p>For the text summary, I’ll use one of the Ollama models (<a href="https://ollama.com/library/gemma2">gemma2:2b</a>) to summarize our text chunk with the help of one of the helper functions <code>get_text_summaries</code></p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=b33b9c99-a1a7-44d1-97fc-9492ee90ffb6">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=f1a69487-b53b-45cc-bc54-3f3b8f497b8d">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8116,8 +8121,21 @@ e.g. <code>ollama pull gemma2</code></li>
 <div class="jp-InputPrompt jp-InputArea-prompt">In [12]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="n">text_summary</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="o">.</span><span class="n">text</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">chunks</span><span class="p">]</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">text_summary</span> <span class="o">=</span> <span class="n">get_text_summaries</span><span class="p">(</span><span class="n">text_summary_model_name</span><span class="p">,</span> <span class="n">texts</span><span class="p">)</span>
+<span class="n">text_summary</span>
 </pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child jp-OutputArea-executeResult">
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[12]:</div>
+<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
+<pre>["This report analyzes electricity usage for a home with account number 954137 at 1627 Tulip Lane. The user's energy consumption is above typical levels and they can save up to 6% by doing full laundry loads.  The report provides tailored tips for energy saving, including caulking windows and doors, charging EVs overnight, adjusting thermostat settings, and pre-heating homes on cold days. It also highlights the importance of a home energy audit for further efficiency improvements. \n"]</pre>
 </div>
 </div>
 </div>
@@ -8129,7 +8147,7 @@ e.g. <code>ollama pull gemma2</code></li>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="Image-captioning">Image captioning<a class="anchor-link" href="#Image-captioning">¶</a></h3><p>For image captioning, I will be using a HuggingFace model (<a href="https://huggingface.co/microsoft/git-base">microsoft/git-base</a>) to do simple image captioning, this is not really a super good model for captioning and describing images like charts but its good enough for now as some of the better image to text models are behind a pay wall like OpenAI which can be better in captioning.</p>
+<h3 id="Image-captioning">Image captioning<a class="anchor-link" href="#Image-captioning">¶</a></h3><p>For image captioning, I’m using the HuggingFace model (<a href="https://huggingface.co/microsoft/git-base">microsoft/git-base</a>). While it’s not the most advanced model for generating detailed descriptions, especially for complex visuals like charts, it performs reasonably well for basic captioning tasks. Some of the more capable image-to-text models, such as those from OpenAI, Amazon Bedrock, etc., offer better results but are currently behind a paywall.</p>
 </div>
 </div>
 </div>
@@ -8143,7 +8161,7 @@ e.g. <code>ollama pull gemma2</code></li>
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="n">captioner</span> <span class="o">=</span> <span class="n">pipeline</span><span class="p">(</span>
     <span class="s2">"image-to-text"</span><span class="p">,</span> 
-    <span class="n">model</span><span class="o">=</span><span class="s2">"microsoft/git-base"</span><span class="p">,</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">caption_model_name</span><span class="p">,</span>
     <span class="n">device</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
     <span class="n">use_fast</span><span class="o">=</span><span class="kc">True</span>
 <span class="p">)</span>
@@ -8244,7 +8262,8 @@ this is a picture of a hammer on a white background. i like the orange in the mi
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Setting-Up-the-Vector-and-Document-Store">Setting Up the Vector and Document Store<a class="anchor-link" href="#Setting-Up-the-Vector-and-Document-Store">¶</a></h2><p>Here, we use ChromaDB as the vector store and an in-memory store for the documents. Each summary and corresponding document will be assigned a doc_id to support retrieval later on. The embedding model used here for the vector embeddings is a version of the FlagEmbedding model <a href="https://huggingface.co/BAAI/bge-large-en-v1.5">BAAI/bge-large-en-v1.5</a> which is focused on retrieval-augmented LLMs.</p>
+<h2 id="Setting-Up-the-Vector-and-Document-Store">Setting Up the Vector and Document Store<a class="anchor-link" href="#Setting-Up-the-Vector-and-Document-Store">¶</a></h2><p>Here, we use ChromaDB as the vector store and an in-memory store for the documents. Each summary and corresponding document will be assigned a doc_id to support retrieval later on. The embedding model used here for the vector embeddings is a version of the FlagEmbedding model (<a href="https://huggingface.co/BAAI/bge-large-en-v1.5">BAAI/bge-large-en-v1.5</a>) which is focused on retrieval-augmented LLMs.</p>
+<p>Vector and Document Databases in this use case are not persistently stored for the simplicity of this exercise but one can set them up to be store in a persistent and durable database or store.</p>
 </div>
 </div>
 </div>
@@ -8328,7 +8347,7 @@ this is a picture of a hammer on a white background. i like the orange in the mi
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [27]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [18]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="n">top_1_doc_from_query</span> <span class="o">=</span> <span class="n">retriever</span><span class="o">.</span><span class="n">invoke</span><span class="p">(</span><span class="s2">"Image of graph containing elecricity consumption?"</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
@@ -8373,13 +8392,13 @@ this is a picture of a hammer on a white background. i like the orange in the mi
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e70c283c-e227-49cc-97db-73c1fe3cb313">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e924ab35-11e4-4235-ae1d-81e9c2d610b7">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Full-RAG-with-Ollama-(gemma3)-Question-and-Answering">Full RAG with Ollama (gemma3) Question and Answering<a class="anchor-link" href="#Full-RAG-with-Ollama-(gemma3)-Question-and-Answering">¶</a></h2><p>This defines a LangChain-style RAG pipeline for LLM question answering. It retrieves relevant documents from the vector-document store using the user’s question, parses the retrieved content (<code>parse_docs</code> function), constructs a prompt (<code>build_prompt</code> function), and sends it to an Ollama-hosted LLM (OllamaLLM). The final answer is then parsed into a string using <code>StrOutputParser()</code>. The use of <code>RunnableLambda</code> and <code>RunnablePassthrough()</code> allows flexible chaining of custom functions and inputs in the LangChain pipeline. I set the LLM's <code>tempreture</code> param to 0 for the output to be consistent on repeated runs.</p>
+<h2 id="Full-RAG-with-Ollama-(gemma3)-Question-and-Answering">Full RAG with Ollama (gemma3) Question and Answering<a class="anchor-link" href="#Full-RAG-with-Ollama-(gemma3)-Question-and-Answering">¶</a></h2><p>This defines a LangChain-style RAG pipeline for LLM question answering. It retrieves relevant documents from the vector-document store using the user’s question, parses the retrieved content (<code>parse_docs</code> helper function), constructs a prompt (<code>build_prompt</code> helper function), and sends it to an Ollama-hosted LLM (<a href="https://ollama.com/library/gemma3">gemma3</a>). The final answer is then parsed into a string using <code>StrOutputParser()</code>. The use of <code>RunnableLambda</code> and <code>RunnablePassthrough()</code> allows flexible chaining of custom functions and inputs in the LangChain pipeline. I set the LLM's <code>tempreture</code> param to 0 for the output to be consistent on repeated runs.</p>
 </div>
 </div>
 </div>
@@ -8433,7 +8452,9 @@ this is a picture of a hammer on a white background. i like the orange in the mi
 <div class="jp-InputPrompt jp-InputArea-prompt">In [20]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="n">display</span><span class="p">(</span><span class="n">Markdown</span><span class="p">(</span><span class="n">chain_llm_questions</span><span class="o">.</span><span class="n">invoke</span><span class="p">(</span><span class="s2">"What is the customer name, address, month cycle and account id?"</span><span class="p">)))</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">q1</span> <span class="o">=</span> <span class="s2">"What is the customer name, address, month cycle and account id?"</span>
+<span class="n">q1_model_resp</span> <span class="o">=</span> <span class="n">chain_llm_questions</span><span class="o">.</span><span class="n">invoke</span><span class="p">(</span><span class="n">q1</span><span class="p">)</span>
+<span class="n">display</span><span class="p">(</span><span class="n">Markdown</span><span class="p">(</span><span class="n">q1_model_resp</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
@@ -8489,7 +8510,9 @@ this is a picture of a hammer on a white background. i like the orange in the mi
 <div class="jp-InputPrompt jp-InputArea-prompt">In [21]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="n">display</span><span class="p">(</span><span class="n">Markdown</span><span class="p">(</span><span class="n">chain_llm_questions</span><span class="o">.</span><span class="n">invoke</span><span class="p">(</span><span class="s2">"What is the category of my electric use?"</span><span class="p">)))</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">q2</span> <span class="o">=</span> <span class="s2">"What is the category of my electric use?"</span>
+<span class="n">q2_model_resp</span> <span class="o">=</span> <span class="n">chain_llm_questions</span><span class="o">.</span><span class="n">invoke</span><span class="p">(</span><span class="n">q2</span><span class="p">)</span>
+<span class="n">display</span><span class="p">(</span><span class="n">Markdown</span><span class="p">(</span><span class="n">q2_model_resp</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
@@ -8539,7 +8562,9 @@ this is a picture of a hammer on a white background. i like the orange in the mi
 <div class="jp-InputPrompt jp-InputArea-prompt">In [22]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="n">display</span><span class="p">(</span><span class="n">Markdown</span><span class="p">(</span><span class="n">chain_llm_questions</span><span class="o">.</span><span class="n">invoke</span><span class="p">(</span><span class="s2">"What is my electricity usage this cycle in kWh?"</span><span class="p">)))</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">q3</span> <span class="o">=</span> <span class="s2">"What is my electricity usage this cycle in kWh?"</span>
+<span class="n">q3_model_resp</span> <span class="o">=</span> <span class="n">chain_llm_questions</span><span class="o">.</span><span class="n">invoke</span><span class="p">(</span><span class="n">q3</span><span class="p">)</span>
+<span class="n">display</span><span class="p">(</span><span class="n">Markdown</span><span class="p">(</span><span class="n">q3_model_resp</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
@@ -8589,7 +8614,9 @@ this is a picture of a hammer on a white background. i like the orange in the mi
 <div class="jp-InputPrompt jp-InputArea-prompt">In [23]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="n">display</span><span class="p">(</span><span class="n">Markdown</span><span class="p">(</span><span class="n">chain_llm_questions</span><span class="o">.</span><span class="n">invoke</span><span class="p">(</span><span class="s2">"What are some tips for saving electricity?"</span><span class="p">)))</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">q4</span> <span class="o">=</span> <span class="s2">"What are some tips for saving electricity?"</span>
+<span class="n">q4_model_resp</span> <span class="o">=</span> <span class="n">chain_llm_questions</span><span class="o">.</span><span class="n">invoke</span><span class="p">(</span><span class="n">q4</span><span class="p">)</span>
+<span class="n">display</span><span class="p">(</span><span class="n">Markdown</span><span class="p">(</span><span class="n">q4_model_resp</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
@@ -8675,7 +8702,9 @@ this is a picture of a hammer on a white background. i like the orange in the mi
 <div class="jp-InputPrompt jp-InputArea-prompt">In [25]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="n">display</span><span class="p">(</span><span class="n">Markdown</span><span class="p">(</span><span class="n">chain_llm_questions</span><span class="o">.</span><span class="n">invoke</span><span class="p">(</span><span class="s2">"How do I compare to other nearby homes in kwh consumption?"</span><span class="p">)))</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">q5</span> <span class="o">=</span> <span class="s2">"How do I compare to other nearby homes in kwh consumption?"</span>
+<span class="n">q5_model_resp</span> <span class="o">=</span> <span class="n">chain_llm_questions</span><span class="o">.</span><span class="n">invoke</span><span class="p">(</span><span class="n">q5</span><span class="p">)</span>
+<span class="n">display</span><span class="p">(</span><span class="n">Markdown</span><span class="p">(</span><span class="n">q5_model_resp</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
@@ -8725,7 +8754,9 @@ this is a picture of a hammer on a white background. i like the orange in the mi
 <div class="jp-InputPrompt jp-InputArea-prompt">In [26]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="n">display</span><span class="p">(</span><span class="n">Markdown</span><span class="p">(</span><span class="n">chain_llm_questions</span><span class="o">.</span><span class="n">invoke</span><span class="p">(</span><span class="s2">"Compared to other nearby homes am I using too much electricity?"</span><span class="p">)))</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">q6</span> <span class="o">=</span> <span class="s2">"Compared to other nearby homes am I using too much electricity?"</span>
+<span class="n">q6_model_resp</span> <span class="o">=</span> <span class="n">chain_llm_questions</span><span class="o">.</span><span class="n">invoke</span><span class="p">(</span><span class="n">q6</span><span class="p">)</span>
+<span class="n">display</span><span class="p">(</span><span class="n">Markdown</span><span class="p">(</span><span class="n">q6_model_resp</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
@@ -8802,7 +8833,7 @@ this is a picture of a hammer on a white background. i like the orange in the mi
 <li>Text embedding for similarity</li>
 <li>LLM-based question answering</li>
 </ul>
-<p>One of the key challenges was selecting the right open-source models. HuggingFace offers many options, but it’s often unclear which are best, especially for free use. Most tutorials rely on high-end models from providers like OpenAI, many of which are behind paywalls most especially for image based tasks.</p>
+<p>One of the key challenges was selecting the right open-source models. HuggingFace offers many options, but it’s often unclear which are best, especially for free use. Most tutorials rely on high-end models from providers like OpenAI and Amazon Bedrock to name a few, many of which are behind paywalls most especially for image based tasks.</p>
 <p>I experimented with several models and combined them to achieve acceptable results. However, the LLM in the RAG setup was prone to hallucinations. To improve this, fine-tuning—possibly with instruction tuning techniques like <a href="https://arxiv.org/abs/2502.03843">Large-Scale Instruction Synthesis</a> could help reduce errors.</p>
 <p>Lastly, extracting content from PDFs posed its own issues. While text extraction worked well, image and chart extraction using the <code>unstructured</code> python library (likely backed by Tesseract OCR) was less reliable and may require further tuning or alternative tools as the extracted images looked like they were cropped poorly.</p>
 </div>
@@ -8818,6 +8849,422 @@ this is a picture of a hammer on a white background. i like the orange in the mi
 <h1 id="References">References<a class="anchor-link" href="#References">¶</a></h1><p>[1] <a href="https://github.com/langchain-ai/langchain/blob/master/cookbook/Semi_structured_and_multi_modal_RAG.ipynb?ref=blog.langchain.dev">LangChain - Semi-structured and Multi-modal RAG</a></p>
 <p>[2] <a href="https://python.langchain.com/docs/how_to/multi_vector/">How to retrieve using multiple vectors per document</a></p>
 <p>[3] <a href="https://gautam75.medium.com/multi-modal-rag-a-practical-guide-99b0178c4fbb">Multi-Modal RAG: A Practical Guide – Using vLLM to serve models for Multimodal Text Summarization, Table Processing, and Answer Synthesis</a></p>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=12435b98-beda-4b81-abc8-224f1a5e065c">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h1 id="Appendix">Appendix<a class="anchor-link" href="#Appendix">¶</a></h1>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=3b05fc3c-5033-4370-b53b-241e441d816f">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="Unit-Test-Setup">Unit Test Setup<a class="anchor-link" href="#Unit-Test-Setup">¶</a></h2><p>Checking the correctness of our RAG pipeline output based on their response vs. expected actual response. I will use of of the helper functions <code>query_and_validate</code> to do this which just takes in the two strings, ask an LLM (<a href="https://ollama.com/library/gemma3">gemma3</a>) if they match enough resulting to <code>true</code>, <code>false</code> or  <code>Can't determine</code>. Ofcourse since using a LLM to evaluate the test it goes down the rabbit hole on how should one test that but for the purposes of checking as groing brute force comparison on deciding how close the model response from actual is complex.</p>
+<p>Of course, using an LLM to evaluate another model’s output introduces its own layer of subjectivity, raising questions about how one should properly test such systems. But for our purposes, this approach is a practical alternative to brute-force string comparisons, which can be too rigid and fail to capture semantic similarity.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=94377b62-898b-4b32-8f28-4c84d3e99070">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h3 id="Q1-Test">Q1 Test<a class="anchor-link" href="#Q1-Test">¶</a></h3>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=e496ecc4-e23e-4956-a585-7fe1577c21e4">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [27]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">query_and_validate</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">ollama_model_name</span><span class="p">,</span>
+    <span class="n">question</span><span class="o">=</span><span class="n">q1</span><span class="p">,</span>
+    <span class="n">model_response</span><span class="o">=</span><span class="n">q1_model_resp</span><span class="p">,</span>
+    <span class="n">expected_response</span><span class="o">=</span><span class="s2">"""</span>
+<span class="s2">Customer Name: JILL DOE</span>
+<span class="s2">Service Address: 1627 Tulip Lane</span>
+<span class="s2">Month Cycle: March</span>
+<span class="s2">Account ID: 954137</span>
+<span class="s2">"""</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>Question:
+ What is the customer name, address, month cycle and account id?
+
+Expected Response: 
+Customer Name: JILL DOE
+Service Address: 1627 Tulip Lane
+Month Cycle: March
+Account ID: 954137
+
+Actual Response: Here’s the information based on the provided context:
+
+*   **Customer Name:** JILL DOE
+*   **Service Address:** 1627 Tulip Lane
+*   **Month Cycle:** March
+*   **Account ID:** 954137
+---
+(Answer with 'true' or 'false') Does the actual response match the expected response? 
+
+<span class="ansi-green-intense-fg">Response: true</span>
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child jp-OutputArea-executeResult">
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[27]:</div>
+<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
+<pre>True</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f38095bf-134d-486f-8027-de27e649fa60">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h3 id="Q2-Test">Q2 Test<a class="anchor-link" href="#Q2-Test">¶</a></h3>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=23eb0881-f1ef-4c9e-9f40-541e6210032c">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [28]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">query_and_validate</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">ollama_model_name</span><span class="p">,</span>
+    <span class="n">question</span><span class="o">=</span><span class="n">q2</span><span class="p">,</span>
+    <span class="n">model_response</span><span class="o">=</span><span class="n">q2_model_resp</span><span class="p">,</span>
+    <span class="n">expected_response</span><span class="o">=</span><span class="s2">"""Above Typical Use"""</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>Question:
+ What is the category of my electric use?
+
+Expected Response: Above Typical Use
+Actual Response: Above typical use.
+---
+(Answer with 'true' or 'false') Does the actual response match the expected response? 
+
+<span class="ansi-green-intense-fg">Response: true</span>
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child jp-OutputArea-executeResult">
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[28]:</div>
+<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
+<pre>True</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=de591cc8-f4a1-4198-9e61-4b2261d0b2a5">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h3 id="Q3-Test">Q3 Test<a class="anchor-link" href="#Q3-Test">¶</a></h3>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=f3db7b49-4809-4ac6-a17b-4ec54ebcc19e">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [29]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">query_and_validate</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">ollama_model_name</span><span class="p">,</span>
+    <span class="n">question</span><span class="o">=</span><span class="n">q3</span><span class="p">,</span>
+    <span class="n">model_response</span><span class="o">=</span><span class="n">q3_model_resp</span><span class="p">,</span>
+    <span class="n">expected_response</span><span class="o">=</span><span class="s2">"Your electric use: is 125 kWh which is 18% more than similar nearby homes"</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>Question:
+ What is my electricity usage this cycle in kWh?
+
+Expected Response: Your electric use: is 125 kWh which is 18% more than similar nearby homes
+Actual Response: Your electric use: 18% more than similar nearby homes 125 kWh
+---
+(Answer with 'true' or 'false') Does the actual response match the expected response? 
+
+<span class="ansi-red-intense-fg">Response: false</span>
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child jp-OutputArea-executeResult">
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[29]:</div>
+<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
+<pre>False</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0865d259-3f0c-4388-80a9-c2285ff3a560">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h3 id="Q4-Test">Q4 Test<a class="anchor-link" href="#Q4-Test">¶</a></h3>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=9e38424a-fd41-4c36-92e0-77c12749caaa">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [30]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">query_and_validate</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">ollama_model_name</span><span class="p">,</span>
+    <span class="n">question</span><span class="o">=</span><span class="n">q4</span><span class="p">,</span>
+    <span class="n">model_response</span><span class="o">=</span><span class="n">q4_model_resp</span><span class="p">,</span>
+    <span class="n">expected_response</span><span class="o">=</span><span class="s2">"""</span>
+<span class="s2">    Do full laundry loads.</span>
+<span class="s2">    Caulk windows and doors.</span>
+<span class="s2">    Charge your EV overnight (Rates are lower after 9pm).</span>
+<span class="s2">    Look for an Energy Star label.</span>
+<span class="s2">    Adjust thermostat settings.</span>
+<span class="s2">    Pre-heat your home on cold days.    </span>
+<span class="s2">"""</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>Question:
+ What are some tips for saving electricity?
+
+Expected Response: 
+    Do full laundry loads.
+    Caulk windows and doors.
+    Charge your EV overnight (Rates are lower after 9pm).
+    Look for an Energy Star label.
+    Adjust thermostat settings.
+    Pre-heat your home on cold days.    
+
+Actual Response: Here are the tips for saving electricity based on the provided text:
+
+*   Do full laundry loads.
+*   Caulk windows and doors.
+*   Charge your EV overnight (Rates are lower after 9pm).
+*   Look for an Energy Star label.
+*   Adjust thermostat settings.
+*   Pre-heat your home on cold days.
+---
+(Answer with 'true' or 'false') Does the actual response match the expected response? 
+
+<span class="ansi-green-intense-fg">Response: true</span>
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child jp-OutputArea-executeResult">
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[30]:</div>
+<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
+<pre>True</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=6238f58e-5eab-4f4e-aa9e-c5d471dddc0d">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h3 id="Q5-Test">Q5 Test<a class="anchor-link" href="#Q5-Test">¶</a></h3>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=cf23be37-a81c-4c09-99fb-1a51fd9fc5fc">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [31]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">query_and_validate</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">ollama_model_name</span><span class="p">,</span>
+    <span class="n">question</span><span class="o">=</span><span class="n">q5</span><span class="p">,</span>
+    <span class="n">model_response</span><span class="o">=</span><span class="n">q5_model_resp</span><span class="p">,</span>
+    <span class="n">expected_response</span><span class="o">=</span><span class="s2">"""</span>
+<span class="s2">    According to the report, you used 125 kWh which is 18% more than similar nearby homes. </span>
+<span class="s2">    Similar nearby homes used around 103 kWh and efficient nearby homes used 49 kWh"""</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>Question:
+ How do I compare to other nearby homes in kwh consumption?
+
+Expected Response: 
+    According to the report, you used 125 kWh which is 18% more than similar nearby homes. 
+    Similar nearby homes used around 103 kWh and efficient nearby homes used 49 kWh
+Actual Response: According to the report, you used 18% more than similar nearby homes. Your similar nearby homes used 125 kWh, and efficient nearby homes used 103 kWh and 49 kWh.
+---
+(Answer with 'true' or 'false') Does the actual response match the expected response? 
+
+<span class="ansi-red-intense-fg">Response: false</span>
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child jp-OutputArea-executeResult">
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[31]:</div>
+<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
+<pre>False</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=a9ae9159-1918-4f7e-afa6-0ca0e7ea7af9">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h3 id="Q6-Test">Q6 Test<a class="anchor-link" href="#Q6-Test">¶</a></h3>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=4f7ad0e5-baa1-46e3-8b81-4c05349dbff1">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [32]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">query_and_validate</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">ollama_model_name</span><span class="p">,</span>
+    <span class="n">question</span><span class="o">=</span><span class="n">q6</span><span class="p">,</span>
+    <span class="n">model_response</span><span class="o">=</span><span class="n">q6_model_resp</span><span class="p">,</span>
+    <span class="n">expected_response</span><span class="o">=</span><span class="s2">"Yes, your electric use is 18% more than similar nearby homes."</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>Question:
+ Compared to other nearby homes am I using too much electricity?
+
+Expected Response: Yes, your electric use is 18% more than similar nearby homes.
+Actual Response: Yes, your electric use is 18% more than similar nearby homes.
+---
+(Answer with 'true' or 'false') Does the actual response match the expected response? 
+
+<span class="ansi-green-intense-fg">Response: true</span>
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child jp-OutputArea-executeResult">
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[32]:</div>
+<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
+<pre>True</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=634c56df-9ab8-4989-9d13-a4dfe6c56310">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h3 id="Performance-4/6">Performance 4/6<a class="anchor-link" href="#Performance-4/6">¶</a></h3><p>RAG Pipeline on this sample size of questions got 4 out of 6 questions quite accurately. Other 2 questions were close but exhibited some form of hallucination</p>
 </div>
 </div>
 </div>

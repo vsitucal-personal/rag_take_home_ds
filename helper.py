@@ -21,8 +21,58 @@ from langchain.retrievers.multi_vector import MultiVectorRetriever
 
 from unstructured.partition.pdf import partition_pdf
 
+EVAL_PROMPT = """
+Expected Response: {expected_response}
+Actual Response: {actual_response}
+---
+(Answer with 'true' or 'false') Does the actual response match the expected response? 
+"""
 
-def get_images_base64(chunks):
+def query_and_validate(model: str, question: str, model_response: str, expected_response: str):
+    prompt = EVAL_PROMPT.format(
+        expected_response=expected_response, actual_response=model_response
+    )
+
+    model = OllamaLLM(model="gemma3")
+    evaluation_results_str = model.invoke(prompt)
+    evaluation_results_str_cleaned = evaluation_results_str.strip().lower()
+
+    print(f"Question:\n {question}")
+    print(prompt)
+
+    if "true" in evaluation_results_str_cleaned:
+        # Print response in Green if it is correct.
+        print("\033[92m" + f"Response: {evaluation_results_str_cleaned}" + "\033[0m")
+        return True
+    elif "false" in evaluation_results_str_cleaned:
+        # Print response in Red if it is incorrect.
+        print("\033[91m" + f"Response: {evaluation_results_str_cleaned}" + "\033[0m")
+        return False
+    else:
+        return "Can`t Determine"
+
+def get_text_summaries(model: str, texts: list):
+    # Prompt
+    prompt_text = """
+    You are an assistant tasked with summarizing tables and text.
+    Give a concise summary of the table or text.
+    
+    Respond only with the summary, no additionnal comment.
+    Do not start your message by saying "Here is a summary" or anything like that.
+    Just give the summary as it is.
+    
+    Table or text chunk: {element}
+    
+    """
+    prompt = ChatPromptTemplate.from_template(prompt_text)
+    
+    # Summary chain
+    model = OllamaLLM(model="gemma2:2b", temperature=0)
+    summarize_chain = {"element": lambda x: x} | prompt | model | StrOutputParser()
+    text_summaries = summarize_chain.batch(texts, {"max_concurrency": 3})
+    return text_summaries
+
+def get_images_base64(chunks: list):
     images_b64 = []
     for chunk in chunks:
         if "CompositeElement" in str(type(chunk)):
@@ -33,11 +83,11 @@ def get_images_base64(chunks):
     return images_b64
 
 
-def display_base64_image(base64_code, width):
+def display_base64_image(base64_code: str, width: int):
     image_data = base64.b64decode(base64_code)
     display(Image(data=image_data, width=width))
 
-def parse_docs(docs):
+def parse_docs(docs: list):
     b64 = []
     text = []
     for doc in docs:
@@ -48,7 +98,7 @@ def parse_docs(docs):
             text.append(doc)
     return {"images": b64, "texts": text}
 
-def build_prompt(kwargs):
+def build_prompt(kwargs: dict):
 
     docs_by_type = kwargs["context"]
     user_question = kwargs["question"]
