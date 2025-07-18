@@ -7552,7 +7552,7 @@ a.anchor-link {
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h2 id="Solution-Overview">Solution Overview<a class="anchor-link" href="#Solution-Overview">¶</a></h2><p>To tackle the the requirements listed above I will leverage a <strong>Multimodal RAG</strong> (Retrieval Augmented Generation). An overall architecture is shown below:
 <img alt="architecture overview" src="diagrams/architecture%20overview.png"/></p>
-<p>The diagram starts with the input PDF file. The unstructured Python library is used to extract both textual and image content from the document. Text and image summarization models then generate summaries and captions based on the extracted content. These outputs are stored in a vector database, enabling retrieval in response to user queries. Additionally, a general-purpose LLM can be used to generate answers based on the top documents retrieved from the vector database. This entire multimodal RAG workflow is made possible through extensive use of the LangChain framework, which orchestrates the components for document loading, embedding, retrieval, and response generation.</p>
+<p>The diagram starts with the input PDF file. The <code>unstructured</code> Python library is used to extract both textual and image content from the document. Text and image summarization models then generate summaries and captions based on the extracted content. These outputs are stored in a vector-document database, enabling retrieval in response to user queries. Additionally, a general-purpose LLM can be used to generate answers based on the top documents retrieved from the vector-document database. This entire multimodal RAG workflow is made possible through extensive use of the <code>LangChain</code> framework, which orchestrates the components for document loading, embedding, retrieval, and response generation.</p>
 <hr/>
 </div>
 </div>
@@ -7985,7 +7985,7 @@ e.g. <code>ollama pull gemma2</code></li>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Getting images from our chunk we assign it to the <code>images</code> variable, with the help of helper functions <code>get_images_base64</code> to get the image chunks and <code>display_base64_image</code> to display them. Upon checking the images list we seem to have 11 images extracted</p>
+<p>Getting images from our chunk we assign it to the <code>images</code> variable, with the help of helper function <code>get_images_base64</code> to get the image chunks and <code>display_base64_image</code> to display them. Upon checking the images list we seem to have 11 images extracted</p>
 </div>
 </div>
 </div>
@@ -8109,7 +8109,7 @@ e.g. <code>ollama pull gemma2</code></li>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="Text-Summary">Text Summary<a class="anchor-link" href="#Text-Summary">¶</a></h3><p>For the text summary, I’ll use one of the Ollama models (<a href="https://ollama.com/library/gemma2">gemma2:2b</a>) to summarize our text chunk with the help of one of the helper functions <code>get_text_summaries</code></p>
+<h3 id="Text-Summary">Text Summary<a class="anchor-link" href="#Text-Summary">¶</a></h3><p>For the text summary, I’ll use one of the Ollama models (<a href="https://ollama.com/library/gemma2">gemma2:2b</a>) to summarize our text chunk with the help of one of the helper function <code>get_text_summaries</code></p>
 </div>
 </div>
 </div>
@@ -8398,7 +8398,7 @@ this is a picture of a hammer on a white background. i like the orange in the mi
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Full-RAG-with-Ollama-(gemma3)-Question-and-Answering">Full RAG with Ollama (gemma3) Question and Answering<a class="anchor-link" href="#Full-RAG-with-Ollama-(gemma3)-Question-and-Answering">¶</a></h2><p>This defines a LangChain-style RAG pipeline for LLM question answering. It retrieves relevant documents from the vector-document store using the user’s question, parses the retrieved content (<code>parse_docs</code> helper function), constructs a prompt (<code>build_prompt</code> helper function), and sends it to an Ollama-hosted LLM (<a href="https://ollama.com/library/gemma3">gemma3</a>). The final answer is then parsed into a string using <code>StrOutputParser()</code>. The use of <code>RunnableLambda</code> and <code>RunnablePassthrough()</code> allows flexible chaining of custom functions and inputs in the LangChain pipeline. I set the LLM's <code>tempreture</code> param to 0 for the output to be consistent on repeated runs.</p>
+<h2 id="Full-RAG-with-Ollama-(gemma3)-Question-and-Answering">Full RAG with Ollama (gemma3) Question and Answering<a class="anchor-link" href="#Full-RAG-with-Ollama-(gemma3)-Question-and-Answering">¶</a></h2><p>This defines a LangChain-style RAG pipeline for LLM question answering. It retrieves relevant documents from the vector-document store using the user’s question, parses the retrieved content (<code>parse_docs</code> helper function), constructs a prompt (<code>build_prompt</code> helper function), and sends it to an Ollama-hosted LLM (<a href="https://ollama.com/library/gemma3">gemma3</a>). The final answer is then parsed into a string using <code>StrOutputParser()</code>. The use of <code>RunnableLambda</code> and <code>RunnablePassthrough()</code> allows flexible chaining of custom functions and inputs in the LangChain pipeline. I set the LLM's <code>temperature</code> param to 0 for the output to be consistent on repeated runs.</p>
 </div>
 </div>
 </div>
@@ -8815,7 +8815,7 @@ this is a picture of a hammer on a white background. i like the orange in the mi
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="Learnings">Learnings<a class="anchor-link" href="#Learnings">¶</a></h3><p>I was first introduced to Retrieval-Augmented Generation (RAG) during my Natural Language Processing course in my master's program. Most of the implementations I worked on involved textual data using the <code>llama-index</code> framework and using data sourced from PDFs, arXiv articles, and plain text files. Until recently, I hadn't explored the extraction of images, figures, or charts. Learning to implement RAG using a new framework like <code>LangChain</code>, especially in a multimodal context that supports various document types beyond text, has been a fresh and exciting experience for me.</p>
+<h3 id="Learnings">Learnings<a class="anchor-link" href="#Learnings">¶</a></h3><p>I was first introduced to Retrieval-Augmented Generation (RAG) during my Natural Language Processing course in my master's program. Most of the implementations I worked on involved textual data using the <code>llama-index</code> framework and using data sourced from PDFs, arXiv articles, and plain text files. Until recently, I hadn't explored the extraction of images, figures, or charts. Learning to implement RAG using a new framework like <code>LangChain</code>, especially in a multimodal context that supports various document types beyond text has been a fresh and exciting experience for me.</p>
 </div>
 </div>
 </div>
@@ -8833,8 +8833,8 @@ this is a picture of a hammer on a white background. i like the orange in the mi
 <li>Text embedding for similarity</li>
 <li>LLM-based question answering</li>
 </ul>
-<p>One of the key challenges was selecting the right open-source models. HuggingFace offers many options, but it’s often unclear which are best, especially for free use. Most tutorials rely on high-end models from providers like OpenAI and Amazon Bedrock to name a few, many of which are behind paywalls most especially for image based tasks.</p>
-<p>I experimented with several models and combined them to achieve acceptable results. However, the LLM in the RAG setup was prone to hallucinations. To improve this, fine-tuning—possibly with instruction tuning techniques like <a href="https://arxiv.org/abs/2502.03843">Large-Scale Instruction Synthesis</a> could help reduce errors.</p>
+<p>One of the key challenges was selecting the right open-source models. HuggingFace offers many options, but it’s often unclear which are best, especially for free use. Often requiring a lot of trial and errors to find a model that best fits the specific use case. Most tutorials rely on high-end models from providers like OpenAI and Amazon Bedrock to name a few, many of which are behind paywalls most especially for image based tasks.</p>
+<p>I experimented with several models and combined them to achieve acceptable results. However, the LLM in the RAG setup was a bit prone to hallucinations. To improve this, fine-tuning, possibly with instruction tuning techniques like <a href="https://arxiv.org/abs/2502.03843">Large-Scale Instruction Synthesis</a> could help reduce errors.</p>
 <p>Lastly, extracting content from PDFs posed its own issues. While text extraction worked well, image and chart extraction using the <code>unstructured</code> python library (likely backed by Tesseract OCR) was less reliable and may require further tuning or alternative tools as the extracted images looked like they were cropped poorly.</p>
 </div>
 </div>
@@ -8870,8 +8870,8 @@ this is a picture of a hammer on a white background. i like the orange in the mi
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Unit-Test-Setup">Unit Test Setup<a class="anchor-link" href="#Unit-Test-Setup">¶</a></h2><p>Checking the correctness of our RAG pipeline output based on their response vs. expected actual response. I will use of of the helper functions <code>query_and_validate</code> to do this which just takes in the two strings, ask an LLM (<a href="https://ollama.com/library/gemma3">gemma3</a>) if they match enough resulting to <code>true</code>, <code>false</code> or  <code>Can't determine</code>. Ofcourse since using a LLM to evaluate the test it goes down the rabbit hole on how should one test that but for the purposes of checking as groing brute force comparison on deciding how close the model response from actual is complex.</p>
-<p>Of course, using an LLM to evaluate another model’s output introduces its own layer of subjectivity, raising questions about how one should properly test such systems. But for our purposes, this approach is a practical alternative to brute-force string comparisons, which can be too rigid and fail to capture semantic similarity.</p>
+<h2 id="Unit-Test-Setup">Unit Test Setup<a class="anchor-link" href="#Unit-Test-Setup">¶</a></h2><p>Checking the correctness of our RAG pipeline output based on their response vs. expected actual response. I will use of of the helper functions <code>query_and_validate</code> to do this which just takes in the two main strings (actual response and expected, plus a few logging params), ask an LLM (<a href="https://ollama.com/library/gemma3">gemma3</a>) if they match enough resulting to <code>true</code>, <code>false</code> or  <code>Can't determine</code>.</p>
+<p>Using an LLM to evaluate another model’s output introduces its own layer of subjectivity, raising questions about how one should properly test such systems. But for our purposes, this approach is a practical alternative to brute-force string comparisons, which can be too rigid and fail to capture semantic similarity.</p>
 </div>
 </div>
 </div>
