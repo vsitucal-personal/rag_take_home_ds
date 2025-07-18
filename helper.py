@@ -37,7 +37,7 @@ def query_and_validate(model: str, question: str, model_response: str, expected_
     evaluation_results_str = model.invoke(prompt)
     evaluation_results_str_cleaned = evaluation_results_str.strip().lower()
 
-    print(f"Question:\n {question}")
+    print(f"Question:\n{question}")
     print(prompt)
 
     if "true" in evaluation_results_str_cleaned:
