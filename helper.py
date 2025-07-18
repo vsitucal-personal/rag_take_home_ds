@@ -22,8 +22,11 @@ from langchain.retrievers.multi_vector import MultiVectorRetriever
 from unstructured.partition.pdf import partition_pdf
 
 EVAL_PROMPT = """
-Expected Response: {expected_response}
-Actual Response: {actual_response}
+Expected Response:
+{expected_response}
+
+Actual Response: 
+{actual_response}
 ---
 (Answer with 'true' or 'false') Does the actual response match the expected response? 
 """
@@ -42,7 +45,7 @@ def query_and_validate(model: str, question: str, model_response: str, expected_
 
     if "true" in evaluation_results_str_cleaned:
         # Print response in Green if it is correct.
-        print("\033[92m" + f"Response: {evaluation_results_str_cleaned}" + "\033[0m")
+        print("\033[92m" + f"Response:\n{evaluation_results_str_cleaned}" + "\033[0m")
         return True
     elif "false" in evaluation_results_str_cleaned:
         # Print response in Red if it is incorrect.

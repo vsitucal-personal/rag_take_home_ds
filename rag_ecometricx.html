@@ -8920,13 +8920,16 @@ this is a picture of a hammer on a white background. i like the orange in the mi
 <pre>Question:
 What is the customer name, address, month cycle and account id?
 
-Expected Response: 
+Expected Response:
+
 Customer Name: JILL DOE
 Service Address: 1627 Tulip Lane
 Month Cycle: March
 Account ID: 954137
 
-Actual Response: Here’s the information based on the provided context:
+
+Actual Response: 
+Here’s the information based on the provided context:
 
 *   **Customer Name:** JILL DOE
 *   **Service Address:** 1627 Tulip Lane
@@ -8935,7 +8938,8 @@ Actual Response: Here’s the information based on the provided context:
 ---
 (Answer with 'true' or 'false') Does the actual response match the expected response? 
 
-<span class="ansi-green-intense-fg">Response: true</span>
+<span class="ansi-green-intense-fg">Response:
+true</span>
 </pre>
 </div>
 </div>
@@ -8987,12 +8991,16 @@ Actual Response: Here’s the information based on the provided context:
 <pre>Question:
 What is the category of my electric use?
 
-Expected Response: Above Typical Use
-Actual Response: Above typical use.
+Expected Response:
+Above Typical Use
+
+Actual Response: 
+Above typical use.
 ---
 (Answer with 'true' or 'false') Does the actual response match the expected response? 
 
-<span class="ansi-green-intense-fg">Response: true</span>
+<span class="ansi-green-intense-fg">Response:
+true</span>
 </pre>
 </div>
 </div>
@@ -9027,7 +9035,7 @@ Actual Response: Above typical use.
     <span class="n">model</span><span class="o">=</span><span class="n">ollama_model_name</span><span class="p">,</span>
     <span class="n">question</span><span class="o">=</span><span class="n">q3</span><span class="p">,</span>
     <span class="n">model_response</span><span class="o">=</span><span class="n">q3_model_resp</span><span class="p">,</span>
-    <span class="n">expected_response</span><span class="o">=</span><span class="s2">"Your electric use: is 125 kWh which is 18% more than similar nearby homes"</span><span class="p">,</span>
+    <span class="n">expected_response</span><span class="o">=</span><span class="s2">"Your electric use is 125 kWh which is 18% more than similar nearby homes"</span><span class="p">,</span>
 <span class="p">)</span>
 </pre></div>
 </div>
@@ -9044,8 +9052,11 @@ Actual Response: Above typical use.
 <pre>Question:
 What is my electricity usage this cycle in kWh?
 
-Expected Response: Your electric use: is 125 kWh which is 18% more than similar nearby homes
-Actual Response: Your electric use: 18% more than similar nearby homes 125 kWh
+Expected Response:
+Your electric use: is 125 kWh which is 18% more than similar nearby homes
+
+Actual Response: 
+Your electric use: 18% more than similar nearby homes 125 kWh
 ---
 (Answer with 'true' or 'false') Does the actual response match the expected response? 
 
@@ -9108,7 +9119,8 @@ Actual Response: Your electric use: 18% more than similar nearby homes 125 kWh
 <pre>Question:
 What are some tips for saving electricity?
 
-Expected Response: 
+Expected Response:
+
     Do full laundry loads.
     Caulk windows and doors.
     Charge your EV overnight (Rates are lower after 9pm).
@@ -9116,7 +9128,9 @@ Expected Response:
     Adjust thermostat settings.
     Pre-heat your home on cold days.    
 
-Actual Response: Here are the tips for saving electricity based on the provided text:
+
+Actual Response: 
+Here are the tips for saving electricity based on the provided text:
 
 *   Do full laundry loads.
 *   Caulk windows and doors.
@@ -9127,7 +9141,8 @@ Actual Response: Here are the tips for saving electricity based on the provided 
 ---
 (Answer with 'true' or 'false') Does the actual response match the expected response? 
 
-<span class="ansi-green-intense-fg">Response: true</span>
+<span class="ansi-green-intense-fg">Response:
+true</span>
 </pre>
 </div>
 </div>
@@ -9181,10 +9196,13 @@ Actual Response: Here are the tips for saving electricity based on the provided 
 <pre>Question:
 How do I compare to other nearby homes in kwh consumption?
 
-Expected Response: 
+Expected Response:
+
     According to the report, you used 125 kWh which is 18% more than similar nearby homes. 
     Similar nearby homes used around 103 kWh and efficient nearby homes used 49 kWh
-Actual Response: According to the report, you used 18% more than similar nearby homes. Your similar nearby homes used 125 kWh, and efficient nearby homes used 103 kWh and 49 kWh.
+
+Actual Response: 
+According to the report, you used 18% more than similar nearby homes. Your similar nearby homes used 125 kWh, and efficient nearby homes used 103 kWh and 49 kWh.
 ---
 (Answer with 'true' or 'false') Does the actual response match the expected response? 
 
@@ -9240,12 +9258,16 @@ Actual Response: According to the report, you used 18% more than similar nearby 
 <pre>Question:
 Compared to other nearby homes am I using too much electricity?
 
-Expected Response: Yes, your electric use is 18% more than similar nearby homes.
-Actual Response: Yes, your electric use is 18% more than similar nearby homes.
+Expected Response:
+Yes, your electric use is 18% more than similar nearby homes.
+
+Actual Response: 
+Yes, your electric use is 18% more than similar nearby homes.
 ---
 (Answer with 'true' or 'false') Does the actual response match the expected response? 
 
-<span class="ansi-green-intense-fg">Response: true</span>
+<span class="ansi-green-intense-fg">Response:
+true</span>
 </pre>
 </div>
 </div>
