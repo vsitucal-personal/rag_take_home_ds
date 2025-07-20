@@ -3,7 +3,7 @@
 <html lang="en">
 <head><meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>rag_ecometricx</title><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
+<title>rag_econo</title><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
 <style type="text/css">
     pre { line-height: 125%; }
 td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
@@ -7517,7 +7517,7 @@ a.anchor-link {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="EcoMetricx-Take-Home">EcoMetricx Take Home<a class="anchor-link" href="#EcoMetricx-Take-Home">¶</a></h1><p>You will be given a PDF document that contains both textual and graphical data. Your task is to:</p>
+<h1 id="Econo-Take-Home">Econo Take Home<a class="anchor-link" href="#Econo-Take-Home">¶</a></h1><p>You will be given a PDF document that contains both textual and graphical data. Your task is to:</p>
 <ul>
 <li>Extract the textual and graphical information from the PDF pages.</li>
 <li>Convert the extracted graphical data (such as charts or graphs) into a structured, queryable format.</li>
@@ -7733,7 +7733,7 @@ e.g. <code>ollama pull gemma2</code></li>
     <span class="n">max_characters</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span>                  <span class="c1"># defaults to 500</span>
     <span class="n">combine_text_under_n_chars</span><span class="o">=</span><span class="mi">2000</span><span class="p">,</span>       <span class="c1"># defaults to 0</span>
     <span class="n">new_after_n_chars</span><span class="o">=</span><span class="mi">6000</span><span class="p">,</span>
-    <span class="n">mage_output_dir_path</span><span class="o">=</span><span class="s2">"/images/"</span>
+    <span class="n">image_output_dir_path</span><span class="o">=</span><span class="s2">"/images/"</span>
 <span class="p">)</span>
 </pre></div>
 </div>
@@ -8263,7 +8263,7 @@ this is a picture of a hammer on a white background. i like the orange in the mi
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h2 id="Setting-Up-the-Vector-and-Document-Store">Setting Up the Vector and Document Store<a class="anchor-link" href="#Setting-Up-the-Vector-and-Document-Store">¶</a></h2><p>Here, we use ChromaDB as the vector store and an in-memory store for the documents. Each summary and corresponding document will be assigned a doc_id to support retrieval later on. The embedding model used here for the vector embeddings is a version of the FlagEmbedding model (<a href="https://huggingface.co/BAAI/bge-large-en-v1.5">BAAI/bge-large-en-v1.5</a>) which is focused on retrieval-augmented LLMs.</p>
-<p>Vector and Document Databases in this use case are not persistently stored for the simplicity of this exercise but one can set them up to be store in a persistent and durable database or store.</p>
+<p>Vector and Document Databases in this use case are not persistently stored for the simplicity of this exercise but one can set them up to be stored in a persistent and durable database or store.</p>
 </div>
 </div>
 </div>
@@ -9053,7 +9053,7 @@ true</span>
 What is my electricity usage this cycle in kWh?
 
 Expected Response:
-Your electric use: is 125 kWh which is 18% more than similar nearby homes
+Your electric use is 125 kWh which is 18% more than similar nearby homes
 
 Actual Response: 
 Your electric use: 18% more than similar nearby homes 125 kWh
