@@ -1,4 +1,4 @@
-# Econo Take Home - Data Scientist
+# RAG Take Home - Data Scientist
 
 ## Read PDF Report and Notebook
 [View Notebook](/rag_econo.ipynb) \
